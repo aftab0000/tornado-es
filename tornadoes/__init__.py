@@ -77,7 +77,7 @@ class ESConnection(object):
 
     def post_by_path(self, path, callback, source):
         url = '%(url)s%(path)s' % {"url": self.url, "path": path}
-        request_http = HTTPRequest(url, method="POST", body=source, **self.http_request_kwargs)
+        request_http = HTTPRequest(url, method="POST", body=source, headers={'Content-Type': 'application/json'}, **self.http_request_kwargs)
         self.client.fetch(request=request_http, callback=callback)
 
     @return_future
@@ -145,5 +145,5 @@ class ESConnection(object):
         if body is not None:
             request_arguments['body'] = body
 
-        request = HTTPRequest(url, **request_arguments)
+        request = HTTPRequest(url, headers={'Content-Type': 'application/json'}, **request_arguments)
         self.client.fetch(request, callback)

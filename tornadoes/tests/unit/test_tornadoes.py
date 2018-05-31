@@ -56,12 +56,7 @@ class TestESConnection(ESConnectionTestBase):
     def test_search_specific_index(self):
         self.es_connection.search(callback=self.stop, index="outroteste")
         response = self._verify_status_code_and_return_response()
-        self.assertEqual(response["hits"]["total"], 14)
-
-    def test_search_apecific_type(self):
-        self.es_connection.search(self.stop, type='galeria')
-        response = self._verify_status_code_and_return_response()
-        self.assertEqual(response["hits"]["total"], 2)
+        self.assertEqual(response["hits"]["total"], 13)
 
     def test_should_access_specific_document(self):
         self.es_connection.get(index="teste", type="materia", uid="171171", callback=self.stop)
@@ -136,8 +131,7 @@ class TestESConnection(ESConnectionTestBase):
             self.es_connection.delete("test", "document", doc_id,
                                       parameters={'refresh': True}, callback=self.stop)
             response = self._verify_status_code_and_return_response()
-
-            self.assertTrue(response['found'])
+            self.assertEqual(response['result'], 'deleted')
             self.assertEqual(response['_index'], 'test')
             self.assertEqual(response['_type'], 'document')
             self.assertEqual(response['_id'], doc_id)
@@ -158,12 +152,7 @@ class TestESConnection(ESConnectionTestBase):
     def test_count_specific_index(self):
         self.es_connection.count(callback=self.stop, index="outroteste")
         response = self._verify_status_code_and_return_response()
-        self.assertEqual(response["count"], 14)
-
-    def test_count_specific_type(self):
-        self.es_connection.count(callback=self.stop, type='galeria')
-        response = self._verify_status_code_and_return_response()
-        self.assertEqual(response["count"], 2)
+        self.assertEqual(response["count"], 13)
 
     def test_count_specific_query(self):
         source = {"query": {"term": {"_id": "171171"}}}
@@ -218,13 +207,7 @@ class TestESConnectionWithTornadoGen(ESConnectionTestBase):
     def test_search_specific_index(self):
         response = yield self.es_connection.search(index="outroteste")
         response = self._verify_status_code_and_return_response(response)
-        self.assertEqual(response["hits"]["total"], 14)
-
-    @gen_test
-    def test_search_apecific_type(self):
-        response = yield self.es_connection.search(type='galeria')
-        response = self._verify_status_code_and_return_response(response)
-        self.assertEqual(response["hits"]["total"], 2)
+        self.assertEqual(response["hits"]["total"], 13)
 
     @gen_test
     def test_should_access_specific_document_using_tornado_gen(self):
@@ -270,7 +253,7 @@ class TestESConnectionWithTornadoGen(ESConnectionTestBase):
                                                        parameters={'refresh': True})
             response = self._verify_status_code_and_return_response(response)
 
-            self.assertTrue(response['found'])
+            self.assertEqual(response['result'], 'deleted')
             self.assertEqual(response['_index'], 'test')
             self.assertEqual(response['_type'], 'document')
             self.assertEqual(response['_id'], doc_id)
@@ -278,12 +261,12 @@ class TestESConnectionWithTornadoGen(ESConnectionTestBase):
     @gen_test
     def test_count_specific_index(self):
         response = yield self.es_connection.count(index="outroteste")
-        self.assertCount(response, 14)
+        self.assertCount(response, 13)
 
-    @gen_test
-    def test_count_specific_type(self):
-        response = yield self.es_connection.count(type='galeria')
-        self.assertCount(response, 2)
+    # @gen_test
+    # def test_count_specific_type(self):
+    #     response = yield self.es_connection.count(type='galeria')
+    #     self.assertCount(response, 2)
 
     @gen_test
     def test_count_specific_query(self):
